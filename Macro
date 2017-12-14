@@ -105,7 +105,7 @@ for(s=0;s<chan;s++){
 			Num = Num + "	" + number;
 			norm = norm + "	" + (number/areaArray[i]);
 			}
-		ROIString = ROIString + are +"		"+ Num +"		"+norm+"	"+areaArray[i]+"\n";
+		ROIString = ROIString + are +"		"+ Num +"		"+norm+"		"+areaArray[i]+"\n";
 		selectImage(title);
 		close();
 		selectWindow(title+"_"+colorArray[s]+20+"_mask");
@@ -196,9 +196,21 @@ if(chan == 2)	{
 			}
 			t = t+5;
 			selectImage(title);
-			close();	
+			close();
+			
 		}
 		colocString = colocString + oneTwo +"		"+ twoOne +"		"+ oneNorm +"		"+ twoNorm +"\n";
+		open(maskArray[0]+maskList1[n]);
+		open(maskArray[1]+maskList2[n]);
+		if(colorArray[1] == "Red") {
+			run("Merge Channels...", "c1="+maskList2[n]+" c2="+maskList1[n]+" create");
+		}
+		else {
+			run("Merge Channels...", "c1="+maskList1[n]+" c2="+maskList2[n]+" create");
+		}
+		selectImage("Composite");
+		saveAs("Tiff",resultsdir+shortTitle+"_coloc");
+		close();
 	}
 	print(colocString);
 }
