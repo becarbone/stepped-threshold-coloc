@@ -154,12 +154,12 @@ if(chan == 2)	{
 						oneTwoCount = oneTwoCount+1;
 					}
 				}
-				oneTwo = oneTwo +"	"+oneTwoCount;
-				oneNorm = oneNorm +"	"+(oneTwoCount/areaArray[n]);
 			}
 			else {
-				oneTwo = oneTwo +"	0	";
+				oneTwo = oneTwo +"	0";
 			}
+			oneTwo = oneTwo +"	"+oneTwoCount;
+			oneNorm = oneNorm +"	"+(oneTwoCount/areaArray[n]);
 			t = t+5;
 			selectImage(title);
 			close();
@@ -188,12 +188,12 @@ if(chan == 2)	{
 						twoOneCount = twoOneCount+1;
 					}
 				}
-				twoOne = twoOne +"	"+twoOneCount;
-				twoNorm = twoNorm +"	"+(twoOneCount/areaArray[n]);
 			}
 			else {
-				twoOne = twoOne +"	0	";
+				twoOne = twoOne +"	0";
 			}
+			twoOne = twoOne +"	"+twoOneCount;
+			twoNorm = twoNorm +"	"+(twoOneCount/areaArray[n]);
 			t = t+5;
 			selectImage(title);
 			close();
