@@ -1,27 +1,27 @@
 //made by Bea Carbone - 2017
 
 var sourcedir, sourcelist, color, channel, punctadir, thresholddir, resultsdir;
-var nameArray, ROIareaArray, ROIpunctaArray,condition, filename, title, Num, are;
+var nameArray, ROIareaArray, ROIpunctaArray,condition, filename, title, Num, are, int, Intens;
 var number, area, shortTitle, tempTitle;
 
 //choosing the source folder w/subfolders (automatically lists names of folders in results) 
 //images should be single channel chosen ROI that were taken at 1048x1048 for appropriate sizing of puncta
 //choosing the color of the channels, mostly for labeling's sake
+run("Set Measurements...", "area mean min integrated area_fraction limit redirect=None decimal=3");
 waitForUser("This macro needs several folders: \n-one for each of the separate channel images\n-an empty one for the puncta \n-an empty one for masks \n \n -Files need to be single channel images-");
 Dialog.create("How many channels?");
 	Dialog.addNumber("# of channels",2);
 Dialog.show;
-chan = Dialog.getNumber();
+numbChannel = Dialog.getNumber();
 markerArray = newArray();
 
 Dialog.create("What markers?");
-	for(s=0;s<chan;s++){
+	for(s=0;s<numbChannel;s++){
 		Dialog.addString("Channel"+(s+1),"antibody");
-
 	}
 Dialog.show;
 
-for(s=0;s<chan;s++){
+for(s=0;s<numbChannel;s++){
 	marker = Dialog.getString();
 	markerArray = Array.concat(markerArray,marker);
 }
@@ -32,17 +32,17 @@ colorArray = newArray();
 
 Dialog.create("");
 	color = newArray("Green", "Red", "Blue", "Cyan");
-	for(s=0;s<chan;s++){
+	for(s=0;s<numbChannel;s++){
 		Dialog.addChoice(markerArray[s]+ " color", color, color[s]);
 	}
 Dialog.show;
 
-for(s=0;s<chan;s++){
+for(s=0;s<numbChannel;s++){
 	channel = Dialog.getChoice();
 	colorArray = Array.concat(colorArray,channel);
 }
 
-for(s=0;s<chan;s++){
+for(s=0;s<numbChannel;s++){
 	sourcedir = getDirectory("Choose folder for marker "+markerArray[s]+" ("+ colorArray[s] +") images");
 	chanArray = Array.concat(chanArray,sourcedir);
 }
@@ -51,7 +51,7 @@ for(s=0;s<chan;s++){
 //pull some extra menu bullshit in creating subfolders
 punctaArray = newArray();
 maskArray = newArray();
-for(s=0;s<chan;s++){
+for(s=0;s<numbChannel;s++){
 	punctadir = getDirectory("Choose folder for "+markerArray[s]+" ("+ colorArray[s] +") puncta");
 	punctaArray = Array.concat(punctaArray,punctadir);
 	maskdir = getDirectory("Choose folder for "+markerArray[s]+" ("+ colorArray[s] +") masks");
@@ -71,9 +71,9 @@ l=l+"	";
 //The final presentation of data should be brought into graphpad on an XvY graph of puncta(axis1) and area(axis2), to find
 //a threshold point post-spike of the area and pre-spike or mid-spike of puncta count that reliably
 //indicates the approximate description of the ROI it references.
-for(s=0;s<chan;s++){
+for(s=0;s<numbChannel;s++){
 	nameArray = newArray();
-	ROIString = l+"	"+l+"	"+l+"	Area of ROI\n";
+	ROIString = l+"	"+l+"	"+l+"	"+l+"	Area of ROI\n";
 	sourcelist = getFileList(chanArray[s]);
 	Dialog.create("Areas of ROI");
 		for(r=0;r<sourcelist.length;r++)	{
@@ -95,6 +95,7 @@ for(s=0;s<chan;s++){
 		are = "area_"+title;		
 		Num = "raw_"+title;
 		norm = "puncta/area_"+title;
+		Intens = "intensity_"+title;
 		shortTitle = substring(title,0, lengthOf(title)-4);
 		for(t=20;t<125;t+=5) {
 			selectImage(title);
@@ -104,8 +105,9 @@ for(s=0;s<chan;s++){
 			are = are + "	" + area;
 			Num = Num + "	" + number;
 			norm = norm + "	" + (number/areaArray[i]);
+			Intens = Intens + "	" + int;
 			}
-		ROIString = ROIString + are +"		"+ Num +"		"+norm+"		"+areaArray[i]+"\n";
+		ROIString = ROIString + are +"		"+ Num +"		"+norm+"		"+Intens+"		"+areaArray[i]+"\n";
 		selectImage(title);
 		close();
 		selectWindow(title+"_"+colorArray[s]+20+"_mask");
@@ -120,7 +122,7 @@ for(s=0;s<chan;s++){
 	File.saveString(ROIString, resultsdir+markerArray[s]+" ("+ colorArray[s] +").xls");
 }
 
-if(chan == 2)	{
+if(numbChannel == 2)	{
 	punctaList1 = getFileList(punctaArray[0]);
 	punctaList2 = getFileList(punctaArray[1]);
 	maskList1 = getFileList(maskArray[0]);
@@ -212,12 +214,13 @@ if(chan == 2)	{
 		saveAs("Tiff",resultsdir+shortTitle+"_coloc");
 		close();
 	}
+	File.saveString(colocString, resultsdir+"Colocalization.xls");
 	print(colocString);
 }
 else {
-	print("There are "+chan+" channels, need 2 for colocalization");
+	print("There are "+numbChannel+" channels, need 2 for colocalization");
 }
-File.saveString(colocString, resultsdir+"Colocalization.xls");
+
 
 
 //Referenced functions are relegated to the end of the code
@@ -240,8 +243,10 @@ function mask() {
 		roiManager("Save",punctaArray[s]+"ROI_"+shortTitle+"_"+t+".zip");
 		for(j=0;j<nResults;j++) {
 			area = area + getResult("Area",j);
+			int = int + getResult("RawIntDen",j);
 		}
 		area = area/nResults;
+		int = int/nResults;
 	}
 	roiManager("reset");
 	selectImage("Mask of "+tempTitle+" Segmented"); 
