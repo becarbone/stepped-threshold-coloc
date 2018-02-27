@@ -83,7 +83,6 @@ for(s=0;s<numbChannel;s++){
 	masktemp = getFileList(punctadir);
 	submaskArray = Array.concat(submaskArray,masktemp);
 }
-Array.show(submaskArray,subpunctaArray);
 resultsdir = getDirectory("Choose folder for excel files");
 
 l = "thresholding";
@@ -152,7 +151,6 @@ for(s=0;s<numbChannel;s++)	{
 			run("Select None");
 			setSlice(1);
 			run("Label...", "format=Label starting=0 interval=1 x=5 y=5 font=8 text=[] range=1-51 use");
-			Array.show(maskArray);
 			saveAs("Tiff",maskArray[s]+submaskArray[b]+title);
 			close();
 	
@@ -280,7 +278,7 @@ function mask() {
 	roiManager("Measure");
 	area = 0;
 	if(roiManager("count")>0) {
-		roiManager("Save",punctaArray[s]+subpunctaArray[b]+"ROI_"+shortTitle+"_"+t+".zip");
+		//roiManager("Save",punctaArray[s]+subpunctaArray[b]+"ROI_"+shortTitle+"_"+t+".zip");
 		for(j=0;j<nResults;j++) {
 			area = area + getResult("Area",j);
 			int = int + getResult("RawIntDen",j);
